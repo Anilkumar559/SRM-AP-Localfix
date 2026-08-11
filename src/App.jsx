@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   GoogleAuthProvider,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
@@ -13,144 +12,170 @@ import "./App.css";
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loginLoading, setLoginLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // ==========================================
+  // CHECK FIREBASE AUTH STATE
+  // ==========================================
+
   useEffect(() => {
-    let redirectChecked = false;
-    let authStateChecked = false;
-
-    function checkUser(currentUser) {
-      if (!currentUser) {
-        return;
-      }
-
-      const email =
-        currentUser.email?.toLowerCase() || "";
-
-      console.log("LocalFix email:", email);
-
-      // Only allow SRM University AP accounts
-      if (!email.endsWith("@srmap.edu.in")) {
-        setError(
-          "Access denied. Please use your @srmap.edu.in account."
-        );
-
-        signOut(auth);
-        setUser(null);
-
-        return;
-      }
-
-      console.log(
-        "SRM AP account accepted:",
-        email
-      );
-
-      setUser(currentUser);
-      setError("");
-    }
-
-    // Firebase authentication state
     const unsubscribe = onAuthStateChanged(
       auth,
       (currentUser) => {
         console.log(
-          "Auth state changed:",
+          "Firebase auth state:",
           currentUser?.email || "No user"
         );
 
-        authStateChecked = true;
-
-        if (currentUser) {
-          checkUser(currentUser);
-        }
-
-        if (redirectChecked) {
+        if (!currentUser) {
+          setUser(null);
           setLoading(false);
+          return;
         }
-      }
-    );
 
-    // Google redirect result
-    getRedirectResult(auth)
-      .then((result) => {
+        const email =
+          currentUser.email?.toLowerCase() || "";
+
         console.log(
-          "Redirect result:",
-          result
+          "Checking email:",
+          email
         );
 
-        redirectChecked = true;
-
-        if (result?.user) {
+        // Only SRM AP accounts are allowed
+        if (!email.endsWith("@srmap.edu.in")) {
           console.log(
-            "Google login successful:",
-            result.user.email
+            "Access denied:",
+            email
           );
 
-          checkUser(result.user);
+          signOut(auth);
+
+          setUser(null);
+
+          setError(
+            "Access denied. Please use your @srmap.edu.in account."
+          );
+
+          setLoading(false);
+
+          return;
         }
 
-        if (authStateChecked) {
-          setLoading(false);
-        }
-      })
-      .catch((error) => {
-        console.error(
-          "Redirect error:",
-          error
+        // Valid SRM AP account
+        console.log(
+          "SRM AP account accepted:",
+          email
         );
 
-        redirectChecked = true;
-
-        setError(error.message);
-
-        if (authStateChecked) {
-          setLoading(false);
-        }
-      });
+        setUser(currentUser);
+        setError("");
+        setLoading(false);
+      }
+    );
 
     return () => {
       unsubscribe();
     };
   }, []);
 
-  // =========================
+  // ==========================================
   // GOOGLE LOGIN
-  // =========================
+  // ==========================================
 
   async function login() {
     setError("");
-
-    const provider =
-      new GoogleAuthProvider();
-
-    provider.setCustomParameters({
-      hd: "srmap.edu.in",
-    });
+    setLoginLoading(true);
 
     try {
       console.log(
         "Starting Google login..."
       );
 
-      await signInWithRedirect(
-        auth,
-        provider
+      const provider =
+        new GoogleAuthProvider();
+
+      // Tell Google we want SRM AP accounts
+      provider.setCustomParameters({
+        hd: "srmap.edu.in",
+      });
+
+      const result =
+        await signInWithPopup(
+          auth,
+          provider
+        );
+
+      console.log(
+        "Google login successful:",
+        result.user.email
       );
+
+      const email =
+        result.user.email?.toLowerCase() || "";
+
+      // Extra security check
+      if (!email.endsWith("@srmap.edu.in")) {
+        await signOut(auth);
+
+        setUser(null);
+
+        setError(
+          "Access denied. Please use your SRM University AP Google account."
+        );
+
+        return;
+      }
+
+      // Login successful
+      setUser(result.user);
+      setError("");
+
+      console.log(
+        "LocalFix login complete."
+      );
+
     } catch (error) {
       console.error(
         "Google login error:",
         error
       );
 
-      setError(error.message);
-      setLoading(false);
+      if (
+        error.code ===
+        "auth/popup-closed-by-user"
+      ) {
+        setError(
+          "Google sign-in was cancelled."
+        );
+      } else if (
+        error.code ===
+        "auth/popup-blocked"
+      ) {
+        setError(
+          "Google sign-in popup was blocked. Please allow popups for localhost."
+        );
+      } else if (
+        error.code ===
+        "auth/cancelled-popup-request"
+      ) {
+        setError(
+          "Another Google sign-in request is already running."
+        );
+      } else {
+        setError(
+          error.message ||
+            "Google sign-in failed. Please try again."
+        );
+      }
+    } finally {
+      setLoginLoading(false);
     }
   }
 
-  // =========================
+  // ==========================================
   // LOGOUT
-  // =========================
+  // ==========================================
 
   async function logout() {
     try {
@@ -159,17 +184,25 @@ function App() {
       setUser(null);
       setError("");
 
+      console.log(
+        "User signed out."
+      );
+
     } catch (error) {
       console.error(
         "Logout error:",
         error
       );
+
+      setError(
+        "Unable to sign out. Please try again."
+      );
     }
   }
 
-  // =========================
+  // ==========================================
   // LOADING SCREEN
-  // =========================
+  // ==========================================
 
   if (loading) {
     return (
@@ -199,9 +232,9 @@ function App() {
     );
   }
 
-  // =========================
+  // ==========================================
   // LOGIN SCREEN
-  // =========================
+  // ==========================================
 
   if (!user) {
     return (
@@ -230,12 +263,15 @@ function App() {
           <button
             className="google-login"
             onClick={login}
+            disabled={loginLoading}
           >
             <span className="google-g">
               G
             </span>
 
-            Continue with Google
+            {loginLoading
+              ? "Signing in..."
+              : "Continue with Google"}
           </button>
 
           <p className="login-note">
@@ -258,21 +294,30 @@ function App() {
     );
   }
 
-  // =========================
+  // ==========================================
   // HOME SCREEN
-  // =========================
+  // ==========================================
 
   return (
     <div className="phone-app">
 
+      {/* ====================================
+          PINNED SRM BANNER
+      ==================================== */}
+
       <div className="srm-brand">
+
         <img
           src="/SRMAP.png"
           alt="SRM University AP"
         />
+
       </div>
 
-      {/* HEADER */}
+
+      {/* ====================================
+          HEADER
+      ==================================== */}
 
       <header className="app-header">
 
@@ -302,7 +347,9 @@ function App() {
       </header>
 
 
-      {/* HOME CONTENT */}
+      {/* ====================================
+          HOME CONTENT
+      ==================================== */}
 
       <main className="home-content">
 
@@ -318,7 +365,7 @@ function App() {
             Welcome to LocalFix
           </h1>
 
-          {/* GOOGLE ACCOUNT NAME */}
+          {/* GOOGLE PROFILE NAME */}
 
           <p className="user-name">
             {user.displayName ||
@@ -332,7 +379,9 @@ function App() {
         </section>
 
 
-        {/* VERIFIED ACCOUNT */}
+        {/* ====================================
+            VERIFIED ACCOUNT
+        ==================================== */}
 
         <div className="verified-card">
 
@@ -355,7 +404,9 @@ function App() {
         </div>
 
 
-        {/* REPORT ISSUE */}
+        {/* ====================================
+            REPORT ISSUE
+        ==================================== */}
 
         <button
           className="report-issue-card"
@@ -389,7 +440,9 @@ function App() {
         </button>
 
 
-        {/* ACTIVITY */}
+        {/* ====================================
+            ACTIVITY
+        ==================================== */}
 
         <section className="activity-section">
 
@@ -444,7 +497,9 @@ function App() {
         </section>
 
 
-        {/* RECENT REPORTS */}
+        {/* ====================================
+            RECENT REPORTS
+        ==================================== */}
 
         <section className="recent-section">
 
@@ -488,11 +543,15 @@ function App() {
       </main>
 
 
-      {/* BOTTOM NAVIGATION */}
+      {/* ====================================
+          BOTTOM NAVIGATION
+      ==================================== */}
 
       <nav className="bottom-nav">
 
-        <button className="nav-item active">
+        <button
+          className="nav-item active"
+        >
 
           <span>
             🏠
