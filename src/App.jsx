@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import {
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
@@ -12,91 +13,138 @@ import "./App.css";
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [loginLoading, setLoginLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
+    let redirectChecked = false;
+    let authStateChecked = false;
+
+    function checkUser(currentUser) {
+      if (!currentUser) {
+        return;
+      }
+
+      const email =
+        currentUser.email?.toLowerCase() || "";
+
+      console.log("LocalFix email:", email);
+
+      // Only allow SRM University AP accounts
+      if (!email.endsWith("@srmap.edu.in")) {
+        setError(
+          "Access denied. Please use your @srmap.edu.in account."
+        );
+
+        signOut(auth);
+        setUser(null);
+
+        return;
+      }
+
+      console.log(
+        "SRM AP account accepted:",
+        email
+      );
+
+      setUser(currentUser);
+      setError("");
+    }
+
+    // Firebase authentication state
     const unsubscribe = onAuthStateChanged(
       auth,
       (currentUser) => {
+        console.log(
+          "Auth state changed:",
+          currentUser?.email || "No user"
+        );
+
+        authStateChecked = true;
+
         if (currentUser) {
-          const email =
-            currentUser.email?.toLowerCase() || "";
-
-          // Only SRM University AP accounts
-          if (email.endsWith("@srmap.edu.in")) {
-            setUser(currentUser);
-            setError("");
-          } else {
-            signOut(auth);
-
-            setUser(null);
-
-            setError(
-              "Access denied. Only @srmap.edu.in accounts can use LocalFix."
-            );
-          }
-        } else {
-          setUser(null);
+          checkUser(currentUser);
         }
 
-        setLoading(false);
+        if (redirectChecked) {
+          setLoading(false);
+        }
       }
     );
 
-    return () => unsubscribe();
+    // Google redirect result
+    getRedirectResult(auth)
+      .then((result) => {
+        console.log(
+          "Redirect result:",
+          result
+        );
+
+        redirectChecked = true;
+
+        if (result?.user) {
+          console.log(
+            "Google login successful:",
+            result.user.email
+          );
+
+          checkUser(result.user);
+        }
+
+        if (authStateChecked) {
+          setLoading(false);
+        }
+      })
+      .catch((error) => {
+        console.error(
+          "Redirect error:",
+          error
+        );
+
+        redirectChecked = true;
+
+        setError(error.message);
+
+        if (authStateChecked) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   // =========================
   // GOOGLE LOGIN
   // =========================
 
-  async function loginWithGoogle() {
+  async function login() {
     setError("");
-    setLoginLoading(true);
 
-    const provider = new GoogleAuthProvider();
+    const provider =
+      new GoogleAuthProvider();
 
     provider.setCustomParameters({
       hd: "srmap.edu.in",
     });
 
     try {
-      const result = await signInWithPopup(
+      console.log(
+        "Starting Google login..."
+      );
+
+      await signInWithRedirect(
         auth,
         provider
       );
-
-      const email =
-        result.user.email?.toLowerCase() || "";
-
-      // Double-check SRM AP domain
-      if (!email.endsWith("@srmap.edu.in")) {
-        await signOut(auth);
-
-        setUser(null);
-
-        setError(
-          "Access denied. Please use your SRM University AP account."
-        );
-
-        return;
-      }
-
-      setUser(result.user);
-
     } catch (error) {
       console.error(
         "Google login error:",
         error
       );
 
-      setError(
-        error.message ||
-          "Google login failed. Please try again."
-      );
-    } finally {
-      setLoginLoading(false);
+      setError(error.message);
+      setLoading(false);
     }
   }
 
@@ -120,7 +168,7 @@ function App() {
   }
 
   // =========================
-  // LOADING
+  // LOADING SCREEN
   // =========================
 
   if (loading) {
@@ -142,7 +190,7 @@ function App() {
           </p>
 
           <p className="login-description">
-            Checking your account...
+            Checking your Google account...
           </p>
 
         </div>
@@ -181,16 +229,13 @@ function App() {
 
           <button
             className="google-login"
-            onClick={loginWithGoogle}
-            disabled={loginLoading}
+            onClick={login}
           >
             <span className="google-g">
               G
             </span>
 
-            {loginLoading
-              ? "Signing in..."
-              : "Continue with Google"}
+            Continue with Google
           </button>
 
           <p className="login-note">
@@ -220,6 +265,13 @@ function App() {
   return (
     <div className="phone-app">
 
+      <div className="srm-brand">
+        <img
+          src="/SRMAP.png"
+          alt="SRM University AP"
+        />
+      </div>
+
       {/* HEADER */}
 
       <header className="app-header">
@@ -239,7 +291,9 @@ function App() {
         <button
           className="notification-btn"
           onClick={() =>
-            alert("Notifications coming soon!")
+            alert(
+              "Notifications coming soon!"
+            )
           }
         >
           🔔
@@ -264,10 +318,11 @@ function App() {
             Welcome to LocalFix
           </h1>
 
-          {/* BLUE USER NAME */}
+          {/* GOOGLE ACCOUNT NAME */}
 
           <p className="user-name">
-            {user.email}
+            {user.displayName ||
+              "SRM University AP Student"}
           </p>
 
           <p className="home-subtitle">
@@ -411,7 +466,6 @@ function App() {
 
           </div>
 
-
           <div className="empty-reports">
 
             <div className="empty-icon">
@@ -438,9 +492,7 @@ function App() {
 
       <nav className="bottom-nav">
 
-        <button
-          className="nav-item active"
-        >
+        <button className="nav-item active">
 
           <span>
             🏠
