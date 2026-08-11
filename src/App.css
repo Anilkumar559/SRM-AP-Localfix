@@ -110,6 +110,17 @@ button:disabled {
 }
 
 /* ==========================================
+   DESKTOP PREVIEW - 10% SMALLER
+========================================== */
+
+@media (min-width: 700px) {
+  .phone-app {
+    transform: scale(0.9);
+    transform-origin: top center;
+  }
+}
+
+/* ==========================================
    SRM BANNER
 ========================================== */
 
