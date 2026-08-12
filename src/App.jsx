@@ -6,7 +6,9 @@ import { auth } from "./firebase";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Reports from "./pages/Reports";
+import Profile from "./pages/Profile";
 import ReportIssue from "./pages/ReportIssue";
+import Notifications from "./pages/Notifications";
 
 import "./App.css";
 
@@ -17,7 +19,7 @@ function App() {
   const [page, setPage] = useState("home");
 
   // TEST ONLY
-  // Reports are stored temporarily in React state.
+  // Reports are temporarily stored in React state.
   const [recentReports, setRecentReports] = useState([]);
 
   // ==========================================
@@ -42,12 +44,18 @@ function App() {
         const email =
           currentUser.email?.toLowerCase() || "";
 
+        // Only SRM AP accounts
         if (!email.endsWith("@srmap.edu.in")) {
           signOut(auth);
           setUser(null);
           setLoading(false);
           return;
         }
+
+        console.log(
+          "SRM AP account accepted:",
+          email
+        );
 
         setUser(currentUser);
         setLoading(false);
@@ -56,6 +64,21 @@ function App() {
 
     return () => unsubscribe();
   }, []);
+
+  // ==========================================
+  // LOGOUT
+  // ==========================================
+
+  async function logout() {
+    try {
+      await signOut(auth);
+
+      setUser(null);
+      setPage("home");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  }
 
   // ==========================================
   // LOADING
@@ -125,6 +148,32 @@ function App() {
         user={user}
         setPage={setPage}
         recentReports={recentReports}
+      />
+    );
+  }
+
+  // ==========================================
+  // PROFILE
+  // ==========================================
+
+  if (page === "profile") {
+    return (
+      <Profile
+        user={user}
+        setPage={setPage}
+        logout={logout}
+      />
+    );
+  }
+
+// ==========================================
+// NOTIFICATIONS
+// ==========================================
+
+  if (page === "notifications") {
+    return (
+      <Notifications
+        setPage={setPage}
       />
     );
   }

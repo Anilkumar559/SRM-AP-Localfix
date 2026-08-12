@@ -47,13 +47,15 @@ button:disabled {
 
   position: relative;
 
+  /* Space for fixed SRM banner + bottom navigation */
+  padding-top: 125px;
   padding-bottom: 90px;
-}
 
+  box-sizing: border-box;
+}
 /* Desktop preview */
 @media (min-width: 700px) {
   .phone-app {
-    width: 100%;
     max-width: 430px;
   }
 
@@ -62,11 +64,11 @@ button:disabled {
   }
 
   .srm-brand img {
-    width: 220px;
+    width: 200px;
   }
 
   .app-header {
-    height: 90px;
+    height: 80px;
     padding: 16px 25px;
   }
 
@@ -109,27 +111,24 @@ button:disabled {
   }
 }
 
-/* ==========================================
-   DESKTOP PREVIEW - 10% SMALLER
-========================================== */
-
-@media (min-width: 700px) {
-  .phone-app {
-    transform: scale(0.9);
-    transform-origin: top center;
-  }
-}
-
-/* ==========================================
-   SRM BANNER
-========================================== */
+/* =========================================
+   SRM AP BANNER - PINNED AT TOP
+========================================= */
 
 .srm-brand {
+  position: fixed;
+
+  top: 0;
+  left: 50%;
+
+  transform: translateX(-50%);
+
   width: 100%;
+  max-width: 430px;
 
-  height: 90px;
+  height: 100px;
 
-  background: #101828;
+  background: #101827;
 
   display: flex;
 
@@ -137,18 +136,18 @@ button:disabled {
   justify-content: center;
 
   overflow: hidden;
+
+  z-index: 1000;
 }
 
 .srm-brand img {
-  width: 230px;
+  width: 90%;
+  height: 90%;
 
-  max-width: 80%;
-
-  height: auto;
+  object-fit: contain;
 
   display: block;
 }
-
 /* ==========================================
    HEADER
 ========================================== */
@@ -167,6 +166,12 @@ button:disabled {
   align-items: center;
 
   justify-content: space-between;
+
+  position: relative;
+
+  z-index: 10;
+
+  box-sizing: border-box;
 }
 
 .app-name {
@@ -223,7 +228,7 @@ button:disabled {
 .welcome-section h1 {
   margin: 0;
 
-  font-size: 38px;
+  font-size: 36px;
 
   line-height: 1.15;
 
@@ -237,7 +242,7 @@ button:disabled {
 
   color: #1769ff;
 
-  font-size: 22px;
+  font-size: 20px;
 
   font-weight: 700;
 }
@@ -691,7 +696,7 @@ button:disabled {
 
   width: 100%;
 
-  max-width: 430px;
+  max-width: 540px;
 
   height: 80px;
 
@@ -1689,11 +1694,6 @@ button:disabled {
 @media (max-width: 600px) {
 
   .phone-app {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .bottom-nav {
     max-width: 100%;
   }
 
@@ -1764,3 +1764,552 @@ button:disabled {
   }
 
 }
+
+
+/* =========================================
+   PROFILE IMAGE IN BOTTOM NAV
+========================================= */
+
+.nav-profile-image {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #1769ff;
+  display: block;
+}
+/* ==========================================
+   PROFILE PAGE
+========================================== */
+
+.profile-app {
+  min-height: 100vh;
+
+  padding-top: 125px;
+
+  padding-bottom: 80px;
+
+  box-sizing: border-box;
+
+  background: #f6f8fc;
+}
+
+.profile-page {
+  min-height: calc(100vh - 205px);
+
+  padding: 25px 20px 110px;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: flex-start;
+
+  box-sizing: border-box;
+}
+
+.profile-center {
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  text-align: center;
+
+  padding-top: 10px;
+}
+
+
+/* =========================================
+   MAIN PROFILE PHOTO
+========================================= */
+
+.profile-main-photo,
+.profile-letter {
+  width: 120px;
+  height: 120px;
+
+  border-radius: 50%;
+}
+
+
+/* Google photo */
+
+.profile-main-photo {
+  object-fit: cover;
+
+  border: 4px solid #e8eef8;
+
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+
+/* No Google photo */
+
+.profile-letter {
+  background: #009688;
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 52px;
+
+  font-weight: 500;
+
+  border: 4px solid #e8eef8;
+
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =========================================
+   PROFILE NAME
+========================================= */
+
+.profile-name {
+  max-width: 100%;
+
+  margin: 22px 0 6px;
+
+  color: #071b41;
+
+  font-size: 28px;
+
+  line-height: 1.2;
+
+  font-weight: 800;
+
+  text-align: center;
+}
+
+
+/* =========================================
+   EMAIL
+========================================= */
+
+.profile-email {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 16px;
+
+  line-height: 1.4;
+
+  word-break: break-word;
+}
+
+
+/* =========================================
+   VERIFIED
+========================================= */
+
+.profile-verified {
+  margin: 14px 0 0;
+
+  color: #008f6b;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  text-align: center;
+}
+
+
+/* =========================================
+   PROFILE NAV IMAGE
+========================================= */
+
+.nav-profile-image {
+  width: 32px;
+  height: 32px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  display: block;
+
+  border: 2px solid #1769ff;
+}
+
+
+/* =========================================
+   PROFILE NAV FALLBACK LETTER
+========================================= */
+
+.nav-profile-letter {
+  width: 32px;
+  height: 32px;
+
+  border-radius: 50%;
+
+  background: #009688;
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 16px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================
+   PROFILE ACTIVE
+========================================= */
+
+.nav-item.active {
+  color: #1769ff;
+}
+
+/* ==========================================
+   PROFILE PAGE
+========================================== */
+
+.profile-app {
+  min-height: 100vh;
+}
+
+.profile-page {
+  min-height: calc(100vh - 170px);
+
+  padding: 45px 20px 110px;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: flex-start;
+
+  box-sizing: border-box;
+}
+
+.profile-center {
+  width: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  text-align: center;
+
+  padding-top: 5px;
+}
+
+
+/* ==========================================
+   PROFILE MAIN PHOTO
+========================================== */
+
+.profile-main-photo,
+.profile-letter {
+  width: 120px;
+  height: 120px;
+
+  border-radius: 50%;
+
+  flex-shrink: 0;
+}
+
+.profile-main-photo {
+  object-fit: cover;
+
+  border: 4px solid #e8eef8;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ==========================================
+   PROFILE FALLBACK LETTER
+========================================== */
+
+.profile-letter {
+  background: #009688;
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 52px;
+
+  font-weight: 500;
+
+  border: 4px solid #e8eef8;
+
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+
+/* ==========================================
+   PROFILE NAME
+========================================== */
+
+.profile-name {
+  max-width: 90%;
+
+  margin: 24px 0 7px;
+
+  color: #071b41;
+
+  font-size: 28px;
+
+  line-height: 1.25;
+
+  font-weight: 800;
+
+  text-align: center;
+}
+
+
+/* ==========================================
+   PROFILE EMAIL
+========================================== */
+
+.profile-email {
+  margin: 0;
+
+  color: #64748b;
+
+  font-size: 16px;
+
+  line-height: 1.4;
+
+  word-break: break-word;
+
+  text-align: center;
+}
+
+
+/* ==========================================
+   VERIFIED
+========================================== */
+
+.profile-verified {
+  margin: 16px 0 0;
+
+  color: #008f6b;
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  text-align: center;
+}
+
+
+/* ==========================================
+   PROFILE SIGN OUT
+========================================== */
+
+.profile-signout {
+  margin-top: 32px;
+
+  width: 180px;
+
+  min-height: 48px;
+
+  border: 1px solid #d5dce7;
+
+  border-radius: 14px;
+
+  background: white;
+
+  color: #d92d20;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.profile-signout:hover {
+  background: #fff5f5;
+}
+
+
+/* ==========================================
+   PROFILE NAV IMAGE
+========================================== */
+
+.nav-profile-image {
+  width: 32px;
+  height: 32px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  display: block;
+
+  border: 2px solid #1769ff;
+}
+
+
+/* ==========================================
+   PROFILE NAV FALLBACK LETTER
+========================================== */
+
+.nav-profile-letter {
+  width: 32px;
+  height: 32px;
+
+  border-radius: 50%;
+
+  background: #009688;
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font-size: 16px;
+
+  font-weight: 600;
+}
+
+
+/* ==========================================
+   NAV ICON
+========================================== */
+
+.nav-icon {
+  font-size: 23px;
+
+  line-height: 1;
+}
+
+
+/* ==========================================
+   REPORTS PAGE
+========================================== */
+
+.reports-content {
+  padding: 38px 28px 110px;
+}
+
+.reports-label {
+  margin: 0 0 12px;
+
+  color: #53657d;
+
+  font-size: 20px;
+}
+
+.reports-page-title {
+  margin: 0;
+
+  color: #071a3d;
+
+  font-size: 38px;
+
+  line-height: 1.15;
+
+  font-weight: 800;
+}
+
+.reports-subtitle {
+  margin: 16px 0 30px;
+
+  color: #53657d;
+
+  font-size: 18px;
+
+  line-height: 1.5;
+}
+
+.reports-empty-box {
+  margin-top: 10px;
+}
+
+.empty-report-button {
+  width: 100%;
+
+  min-height: 62px;
+
+  border: none;
+
+  border-radius: 17px;
+
+  background: #1769ff;
+
+  color: white;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  box-shadow:
+    0 8px 20px rgba(
+      23,
+      105,
+      255,
+      0.20
+    );
+}
+
+
+/* ==========================================
+   MOBILE PROFILE
+========================================== */
+
+@media (max-width: 600px) {
+
+  .profile-page {
+    padding-top: 42px;
+  }
+
+  .profile-name {
+    font-size: 28px;
+
+    max-width: 92%;
+  }
+
+  .profile-email {
+    font-size: 16px;
+  }
+
+  .profile-signout {
+    margin-top: 30px;
+  }
+
+  .reports-content {
+    padding: 34px 28px 110px;
+  }
+
+  .reports-page-title {
+    font-size: 36px;
+  }
+
+  .reports-subtitle {
+    font-size: 17px;
+  }
+}
+

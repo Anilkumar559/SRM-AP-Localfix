@@ -1,27 +1,15 @@
-import { signOut } from "firebase/auth";
-
-import { auth } from "../firebase";
-
 function Reports({
+  user,
   setPage,
   recentReports,
 }) {
 
-  async function logout() {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error(
-        "Logout error:",
-        error
-      );
-    }
-  }
-
   return (
     <div className="phone-app">
 
-      {/* SRM BANNER */}
+      {/* ======================================
+          SRM BANNER
+      ====================================== */}
 
       <div className="srm-brand">
 
@@ -32,7 +20,9 @@ function Reports({
 
       </div>
 
-      {/* HEADER */}
+      {/* ======================================
+          HEADER
+      ====================================== */}
 
       <header className="app-header">
 
@@ -49,42 +39,35 @@ function Reports({
         </div>
 
         <button
-          className="notification-btn"
-          onClick={() =>
-            alert(
-              "Notifications coming soon!"
-            )
-          }
-        >
-          🔔
-        </button>
+  className="notification-btn"
+  onClick={() => setPage("notifications")}
+>
+  🔔
+</button>
 
       </header>
 
-      {/* CONTENT */}
+      {/* ======================================
+          REPORTS CONTENT
+      ====================================== */}
 
-      <main className="home-content">
+      <main className="reports-content">
 
-        <section className="welcome-section">
+        <p className="reports-label">
+          📋 Your Reports
+        </p>
 
-          <p className="hello">
-            📋 Your Reports
-          </p>
+        <h1 className="reports-page-title">
+          Recent Reports
+        </h1>
 
-          <h1>
-            Recent Reports
-          </h1>
-
-          <p className="home-subtitle">
-            Track the problems you have
-            reported on campus.
-          </p>
-
-        </section>
+        <p className="reports-subtitle">
+          Track the problems you have reported on campus.
+        </p>
 
         {recentReports.length === 0 ? (
 
-          <div className="empty-reports">
+          <div className="empty-reports reports-empty-box">
 
             <div className="empty-icon">
               📋
@@ -100,7 +83,7 @@ function Reports({
             </p>
 
             <button
-              className="primary-action"
+              className="empty-report-button"
               onClick={() =>
                 setPage("report")
               }
@@ -123,15 +106,19 @@ function Reports({
                 >
 
                   {report.photo ? (
+
                     <img
                       src={report.photo}
                       alt="Reported issue"
                       className="report-card-image"
                     />
+
                   ) : (
+
                     <div className="report-card-image no-photo">
                       📷
                     </div>
+
                   )}
 
                   <div className="report-card-content">
@@ -173,9 +160,13 @@ function Reports({
 
       </main>
 
-      {/* BOTTOM NAV */}
+      {/* ======================================
+          BOTTOM NAVIGATION
+      ====================================== */}
 
       <nav className="bottom-nav">
+
+        {/* HOME */}
 
         <button
           className="nav-item"
@@ -184,7 +175,7 @@ function Reports({
           }
         >
 
-          <span>
+          <span className="nav-icon">
             🏠
           </span>
 
@@ -194,6 +185,8 @@ function Reports({
 
         </button>
 
+        {/* REPORTS */}
+
         <button
           className="nav-item active"
           onClick={() =>
@@ -201,7 +194,7 @@ function Reports({
           }
         >
 
-          <span>
+          <span className="nav-icon">
             📋
           </span>
 
@@ -210,6 +203,8 @@ function Reports({
           </small>
 
         </button>
+
+        {/* PLUS */}
 
         <button
           className="add-report-button"
@@ -220,17 +215,37 @@ function Reports({
           +
         </button>
 
+        {/* PROFILE */}
+
         <button
           className="nav-item"
-          onClick={logout}
+          onClick={() =>
+            setPage("profile")
+          }
         >
 
-          <span>
-            👤
-          </span>
+          {user?.photoURL ? (
+
+            <img
+              src={user.photoURL}
+              alt="Profile"
+              className="nav-profile-image"
+            />
+
+          ) : (
+
+            <span className="nav-profile-letter">
+              {(user?.displayName ||
+                user?.email ||
+                "U")
+                .charAt(0)
+                .toUpperCase()}
+            </span>
+
+          )}
 
           <small>
-            Sign Out
+            Profile
           </small>
 
         </button>

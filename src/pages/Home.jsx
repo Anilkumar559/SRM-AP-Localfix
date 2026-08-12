@@ -1,24 +1,8 @@
-import { signOut } from "firebase/auth";
-
-import { auth } from "../firebase";
-
 function Home({
   user,
   setPage,
   recentReports,
 }) {
-
-  async function logout() {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error(
-        "Logout error:",
-        error
-      );
-    }
-  }
-
   return (
     <div className="phone-app">
 
@@ -27,13 +11,12 @@ function Home({
       ====================================== */}
 
       <div className="srm-brand">
-
         <img
           src="/SRMAP.png"
           alt="SRM University AP"
         />
-
       </div>
+
 
       {/* ======================================
           HEADER
@@ -53,18 +36,19 @@ function Home({
 
         </div>
 
+
+        {/* NOTIFICATIONS */}
+
         <button
           className="notification-btn"
-          onClick={() =>
-            alert(
-              "Notifications coming soon!"
-            )
-          }
+          onClick={() => setPage("notifications")}
+          aria-label="Notifications"
         >
           🔔
         </button>
 
       </header>
+
 
       {/* ======================================
           HOME CONTENT
@@ -82,9 +66,8 @@ function Home({
             Welcome to LocalFix
           </h1>
 
-          {/* GOOGLE ACCOUNT NAME */}
           <p className="user-name">
-            {user.displayName ||
+            {user?.displayName ||
               "SRM University AP Student"}
           </p>
 
@@ -93,6 +76,7 @@ function Home({
           </p>
 
         </section>
+
 
         {/* ====================================
             VERIFIED ACCOUNT
@@ -111,12 +95,13 @@ function Home({
             </strong>
 
             <span>
-              {user.email}
+              {user?.email}
             </span>
 
           </div>
 
         </div>
+
 
         {/* ====================================
             REPORT BUTTON
@@ -124,9 +109,7 @@ function Home({
 
         <button
           className="report-issue-card"
-          onClick={() =>
-            setPage("report")
-          }
+          onClick={() => setPage("report")}
         >
 
           <div className="report-icon">
@@ -151,6 +134,7 @@ function Home({
 
         </button>
 
+
         {/* ====================================
             ACTIVITY
         ==================================== */}
@@ -165,6 +149,7 @@ function Home({
 
           </div>
 
+
           <div className="activity-grid">
 
             <div className="activity-card">
@@ -178,6 +163,7 @@ function Home({
               </span>
 
             </div>
+
 
             <div className="activity-card">
 
@@ -196,6 +182,7 @@ function Home({
               </span>
 
             </div>
+
 
             <div className="activity-card">
 
@@ -219,6 +206,7 @@ function Home({
 
         </section>
 
+
         {/* ====================================
             RECENT REPORTS
         ==================================== */}
@@ -232,14 +220,13 @@ function Home({
             </h2>
 
             <button
-              onClick={() =>
-                setPage("reports")
-              }
+              onClick={() => setPage("reports")}
             >
               View all
             </button>
 
           </div>
+
 
           {recentReports.length === 0 ? (
 
@@ -266,58 +253,64 @@ function Home({
 
               {recentReports
                 .slice(0, 3)
-                .map(
-                  (report) => (
+                .map((report) => (
 
-                    <div
-                      className="report-card"
-                      key={report.id}
-                    >
+                  <div
+                    className="report-card"
+                    key={report.id}
+                  >
 
-                      {report.photo ? (
-                        <img
-                          src={report.photo}
-                          alt="Reported issue"
-                          className="report-card-image"
-                        />
-                      ) : (
-                        <div className="report-card-image no-photo">
-                          📷
-                        </div>
-                      )}
+                    {report.photo ? (
 
-                      <div className="report-card-content">
+                      <img
+                        src={report.photo}
+                        alt="Reported issue"
+                        className="report-card-image"
+                      />
 
-                        <div className="report-card-top">
+                    ) : (
 
-                          <span className="report-category">
-                            {report.category}
-                          </span>
+                      <div className="report-card-image no-photo">
+                        📷
+                      </div>
 
-                          <span className="report-status">
-                            {report.status}
-                          </span>
+                    )}
 
-                        </div>
 
-                        <h3>
-                          {report.description}
-                        </h3>
+                    <div className="report-card-content">
 
-                        <p>
-                          📍 {report.location}
-                        </p>
+                      <div className="report-card-top">
 
-                        <small>
-                          {report.date}
-                        </small>
+                        <span className="report-category">
+                          {report.category}
+                        </span>
+
+                        <span className="report-status">
+                          {report.status}
+                        </span>
 
                       </div>
 
+
+                      <h3>
+                        {report.description}
+                      </h3>
+
+
+                      <p>
+                        📍 {report.location}
+                      </p>
+
+
+                      <small>
+                        {report.date}
+                      </small>
+
                     </div>
 
-                  )
-                )}
+                  </div>
+
+                ))}
 
             </div>
 
@@ -327,20 +320,21 @@ function Home({
 
       </main>
 
+
       {/* ======================================
           BOTTOM NAVIGATION
       ====================================== */}
 
       <nav className="bottom-nav">
 
+        {/* HOME */}
+
         <button
           className="nav-item active"
-          onClick={() =>
-            setPage("home")
-          }
+          onClick={() => setPage("home")}
         >
 
-          <span>
+          <span className="nav-icon">
             🏠
           </span>
 
@@ -350,14 +344,15 @@ function Home({
 
         </button>
 
+
+        {/* REPORTS */}
+
         <button
           className="nav-item"
-          onClick={() =>
-            setPage("reports")
-          }
+          onClick={() => setPage("reports")}
         >
 
-          <span>
+          <span className="nav-icon">
             📋
           </span>
 
@@ -367,26 +362,46 @@ function Home({
 
         </button>
 
+
+        {/* PLUS */}
+
         <button
           className="add-report-button"
-          onClick={() =>
-            setPage("report")
-          }
+          onClick={() => setPage("report")}
         >
           +
         </button>
 
+
+        {/* PROFILE */}
+
         <button
           className="nav-item"
-          onClick={logout}
+          onClick={() => setPage("profile")}
         >
 
-          <span>
-            👤
-          </span>
+          {user?.photoURL ? (
+
+            <img
+              src={user.photoURL}
+              alt="Profile"
+              className="nav-profile-image"
+            />
+
+          ) : (
+
+            <span className="nav-profile-letter">
+              {(user?.displayName ||
+                user?.email ||
+                "U")
+                .charAt(0)
+                .toUpperCase()}
+            </span>
+
+          )}
 
           <small>
-            Sign Out
+            Profile
           </small>
 
         </button>
